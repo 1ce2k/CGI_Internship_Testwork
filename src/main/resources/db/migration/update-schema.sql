@@ -1,0 +1,46 @@
+CREATE SEQUENCE IF NOT EXISTS seats_seq START WITH 1 INCREMENT BY 50;
+
+ALTER TABLE flights
+    ALTER COLUMN base_price TYPE DECIMAL USING (base_price::DECIMAL);
+
+ALTER TABLE airports
+    ALTER COLUMN city DROP NOT NULL;
+
+ALTER TABLE aircraft
+    ALTER COLUMN configuration TYPE VARCHAR(255) USING (configuration::VARCHAR(255));
+
+ALTER TABLE airports
+    ALTER COLUMN country DROP NOT NULL;
+
+ALTER TABLE passengers
+    ALTER COLUMN document_number TYPE VARCHAR(255) USING (document_number::VARCHAR(255));
+
+ALTER TABLE passengers
+    ALTER COLUMN document_type TYPE VARCHAR(255) USING (document_type::VARCHAR(255));
+
+ALTER TABLE flights
+    ALTER COLUMN flight_number TYPE VARCHAR(255) USING (flight_number::VARCHAR(255));
+
+ALTER TABLE users
+    ALTER COLUMN phone TYPE VARCHAR(255) USING (phone::VARCHAR(255));
+
+ALTER TABLE seats
+    ALTER COLUMN price_premium TYPE DECIMAL USING (price_premium::DECIMAL);
+
+ALTER TABLE seats
+    ALTER COLUMN seat_class TYPE VARCHAR(255) USING (seat_class::VARCHAR(255));
+
+ALTER TABLE seats
+    ALTER COLUMN seat_number TYPE VARCHAR(255) USING (seat_number::VARCHAR(255));
+
+ALTER TABLE seats
+    ALTER COLUMN seat_type TYPE VARCHAR(255) USING (seat_type::VARCHAR(255));
+
+ALTER TABLE bookings
+    ALTER COLUMN status TYPE VARCHAR(255) USING (status::VARCHAR(255));
+
+ALTER TABLE flights
+    ALTER COLUMN status TYPE VARCHAR(255) USING (status::VARCHAR(255));
+
+ALTER TABLE bookings
+    ALTER COLUMN total_price TYPE DECIMAL USING (total_price::DECIMAL);
