@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   postgres:
-    image: postgres:15-alpine
+    image: postgres:latest
     container_name: flight-planning-db
     ports:
       - "5432:5432"
@@ -12,6 +12,7 @@ services:
       POSTGRES_PASSWORD: postgres
     volumes:
       - postgres-data:/var/lib/postgresql/data
+      - ./src/main/resources:/docker-entrypoint-initdb.d
     networks:
       - flight-network
     healthcheck:
@@ -19,6 +20,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
 
   pgadmin:
     image: dpage/pgadmin4
@@ -33,9 +35,41 @@ services:
     networks:
       - flight-network
 
+  gradle:
+    image: gradle:8.7-jdk-21-and-22
+    container_name: flight-planning-gradle
+    volumes:
+      - .:/app
+      - gradle-cache:/home/gradle/.gradle
+    working_dir: /app
+    command:
+      - gradle clean build --no-daemon
+    networks:
+      - flight-network
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: flight-planning-app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/flightdb"
+      SPRING_DATASOURCE_USERNAME: "postgres"
+      SPRING_DATASOURCE_PASSWORD: "postgres"
+    networks:
+      - flight-network
+    restart: unless-stopped
+
+
 networks:
   flight-network:
     driver: bridge
 
 volumes:
   postgres-data:
+  gradle-cache:

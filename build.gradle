@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.4.3'
     id 'io.spring.dependency-management' version '1.1.7'
+    id 'org.flywaydb.flyway' version '10.8.1'
 }
 
 group = 'com.danil'
@@ -9,7 +10,7 @@ version = '0.0.1-SNAPSHOT'
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(23)
+        languageVersion = JavaLanguageVersion.of(21)
     }
 }
 
@@ -27,15 +28,38 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    compileOnly 'org.projectlombok:lombok'
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
+
     runtimeOnly 'org.postgresql:postgresql'
+
+    implementation 'org.flywaydb:flyway-core:10.8.1'
+    implementation 'org.flywaydb:flyway-database-postgresql:10.8.1'
+
+    compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
+
+//    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+//    developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+//    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+flyway {
+    url = 'jdbc:postgresql://postgres:5432/flightdb'
+    user = 'postgres'
+    password = 'postgres'
+    baselineOnMigrate = true
+    locations = ['classpath:db/migration']
+}
+
+task cleanAndMigrateDatabase(type: org.flywaydb.gradle.task.FlywayMigrateTask) {
+    dependsOn 'flywayClean'
+    doFirst {
+        println 'Cleaning and migrating database'
+    }
 }
