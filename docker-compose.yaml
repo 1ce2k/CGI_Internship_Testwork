@@ -51,7 +51,6 @@ services:
       GRADLE_OPTS: "-Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.workers.max=4 -Dorg.gradle.caching=true"
 
   app:
-    platform: linux/arm64
     build:
       context: .
       dockerfile: Dockerfile
