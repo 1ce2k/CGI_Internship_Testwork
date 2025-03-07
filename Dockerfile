@@ -1,9 +1,13 @@
-FROM gradle:8.7-jdk-21-and-22 AS BUILD
+# Build stage
+FROM gradle:8.7-jdk21 AS build
 WORKDIR /app
-copy . .
-RUN gradle clean bootjar --no-daemon
+COPY . .
+# Add memory settings that work on both platforms
+ENV GRADLE_OPTS="-Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Xmx2g"
+RUN gradle clean bootJar --no-daemon --stacktrace
 
-FROM eclipse-temurin:23-jre-alpine
+# Run stage
+FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 COPY --from=build /app/build/libs/*.jar app.jar
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-XX:+UseContainerSupport", "-XX:MaxRAMPercentage=75.0", "-jar", "app.jar"]

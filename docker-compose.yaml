@@ -46,15 +46,18 @@ services:
       - gradle clean build --no-daemon
     networks:
       - flight-network
+    environment:
+      # Improve Gradle performance on macOS
+      GRADLE_OPTS: "-Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.workers.max=4 -Dorg.gradle.caching=true"
 
   app:
+    platform: linux/arm64
     build:
       context: .
       dockerfile: Dockerfile
     container_name: flight-planning-app
     depends_on:
-      postgres:
-        condition: service_healthy
+      - postgres
     ports:
       - "8080:8080"
     environment:
